@@ -41,7 +41,7 @@ public class Requests {
         Time time = new Time();
         PostData data = new PostData(time.getHour(), time.getMinute(), getResponse);
 
-        MediaType mediaType = MediaType.parse("text/plain");
+        MediaType mediaType = MediaType.parse("application/json");
         RequestBody requestBody = RequestBody.create(Constants.GSON_INSTANCE.toJson(data), mediaType);
         Request request = new Request.Builder()
                 .url(baseURL + Constants.URL_POST)
@@ -63,7 +63,7 @@ public class Requests {
 
         param.addQueryParameter(Constants.PARAM_ID, postResponse);
 
-        MediaType mediaType = MediaType.parse("text/plain");
+        MediaType mediaType = MediaType.parse("application/json");
         RequestBody requestBody = RequestBody.create(Constants.GSON_INSTANCE.toJson(data), mediaType);
         Request request = new Request.Builder()
                 .url(baseURL + Constants.URL_PUT + param)
