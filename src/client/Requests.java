@@ -22,7 +22,7 @@ public class Requests {
         this.baseURL = url;
     }
 
-    public void get() {
+    private void get() {
         StringBuilder param = new StringBuilder();
         Time time = new Time();
 
@@ -40,7 +40,7 @@ public class Requests {
         }
     }
 
-    public void post() {
+    private void post() {
         Time time = new Time();
         PostData data = new PostData(time.getHour(), time.getMinute(), getResponse);
 
@@ -60,7 +60,7 @@ public class Requests {
         }
     }
 
-    public void put() {
+    private void put() {
         Time time = new Time();
         PutData data = new PutData((time.getHour() + 21) % 24, (time.getMinute() + 13) % 60);
         StringBuilder param = new StringBuilder();
@@ -85,7 +85,7 @@ public class Requests {
         }
     }
 
-    public void delete() {
+    private void delete() {
         StringBuilder param = new StringBuilder();
         param.addQueryParameter(Constants.PARAM_ID, putResponse);
 
@@ -100,6 +100,17 @@ public class Requests {
             Response response = Constants.HTTP_CLIENT.newCall(request).execute();
             System.out.println(response.toString());
         } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void start() {
+        try {
+            get();
+            post();
+            put();
+            delete();
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
