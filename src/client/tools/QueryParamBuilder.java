@@ -1,9 +1,9 @@
 package client.tools;
 
-public class StringBuilder {
+public class QueryParamBuilder {
     String string;
 
-    public StringBuilder() {
+    public QueryParamBuilder() {
         this.string = "?";
     }
 
@@ -11,7 +11,8 @@ public class StringBuilder {
         string += (key + "=" + value);
     }
 
-    public String getString() {
+    @Override
+    public String toString() {
         return string;
     }
 }

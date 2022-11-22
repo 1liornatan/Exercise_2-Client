@@ -4,12 +4,11 @@ import client.dto.PostData;
 import client.dto.PutData;
 import client.dto.ResponseMessage;
 import client.tools.Constants;
-import client.tools.StringBuilder;
+import client.tools.QueryParamBuilder;
 import client.tools.Time;
 import okhttp3.*;
 
 import java.io.IOException;
-import java.util.Date;
 
 
 public class Requests {
@@ -22,83 +21,89 @@ public class Requests {
         this.baseURL = url;
     }
 
-    public void get() {
-        StringBuilder param = new StringBuilder();
+    private void get() throws IOException {
+        QueryParamBuilder param = new QueryParamBuilder();
         Time time = new Time();
 
         param.addQueryParameter(Constants.PARAM_HOUR, time.getHour().toString());
         param.addQueryParameter(Constants.PARAM_MINUTE, time.getMinute().toString());
 
         Request request = new Request.Builder().url(baseURL + Constants.URL_GET + param).build();
-        try {
-            System.out.println("Sending Get Request..");
-            Response response = Constants.HTTP_CLIENT.newCall(request).execute();
-            getResponse = response.toString();
-            System.out.println(response);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        Response response = Constants.HTTP_CLIENT.newCall(request).execute();
+        ResponseBody responseBody = response.body();
+        if(responseBody != null) {
+            getResponse = responseBody.string();
+            responseBody.close();
         }
     }
 
-    public void post() {
+    private void post() throws IOException {
         Time time = new Time();
         PostData data = new PostData(time.getHour(), time.getMinute(), getResponse);
 
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, Constants.GSON_INSTANCE.toJson(data));
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody requestBody = RequestBody.create(Constants.GSON_INSTANCE.toJson(data), mediaType);
         Request request = new Request.Builder()
                 .url(baseURL + Constants.URL_POST)
-                .method("POST", body)
+                .method("POST", requestBody)
                 .build();
-        try {
-            System.out.println("Sending Post request..");
-            Response response = Constants.HTTP_CLIENT.newCall(request).execute();
-            postResponse = response.toString();
-            System.out.printf(response.toString());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+
+        Response response = Constants.HTTP_CLIENT.newCall(request).execute();
+        ResponseBody responseBody = response.body();
+        if(responseBody != null) {
+            postResponse = responseBody.string();
+            responseBody.close();
         }
     }
 
-    public void put() {
+    private void put() throws IOException {
         Time time = new Time();
         PutData data = new PutData((time.getHour() + 21) % 24, (time.getMinute() + 13) % 60);
-        StringBuilder param = new StringBuilder();
+        QueryParamBuilder param = new QueryParamBuilder();
 
         param.addQueryParameter(Constants.PARAM_ID, postResponse);
 
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, Constants.GSON_INSTANCE.toJson(data));
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody requestBody = RequestBody.create(Constants.GSON_INSTANCE.toJson(data), mediaType);
         Request request = new Request.Builder()
                 .url(baseURL + Constants.URL_PUT + param)
-                .method("PUT", body)
+                .method("PUT", requestBody)
                 .build();
-        try {
-            System.out.println("Sending Put request..");
-            Response response = Constants.HTTP_CLIENT.newCall(request).execute();
-            ResponseMessage messageData = Constants.GSON_INSTANCE.fromJson(response.toString(), ResponseMessage.class);
-            putResponse = messageData.getMessage();
-            System.out.println(response.toString());
+        Response response = Constants.HTTP_CLIENT.newCall(request).execute();
+        ResponseBody responseBody = response.body();
 
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        if(responseBody != null) {
+            ResponseMessage messageData = Constants.GSON_INSTANCE.fromJson(responseBody.string(), ResponseMessage.class);
+            putResponse = messageData.getMessage();
+            responseBody.close();
         }
     }
 
-    public void delete() {
-        StringBuilder param = new StringBuilder();
+    private void delete() throws IOException {
+        QueryParamBuilder param = new QueryParamBuilder();
         param.addQueryParameter(Constants.PARAM_ID, putResponse);
 
         MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, "");
+        RequestBody requestBody = RequestBody.create("", mediaType);
         Request request = new Request.Builder()
                 .url(baseURL + Constants.URL_DELETE + param)
-                .method("DELETE", body)
+                .method("DELETE", requestBody)
                 .build();
+        Response response = Constants.HTTP_CLIENT.newCall(request).execute();
+        if(response.isSuccessful())
+            System.out.println("Successful!");
+    }
+
+    public void start() {
         try {
+            System.out.println("Sending Get Request..");
+            get();
+            System.out.println("Sending Post request..");
+            post();
+            System.out.println("Sending Put request..");
+            put();
             System.out.println("Sending Delete request..");
-            Response response = Constants.HTTP_CLIENT.newCall(request).execute();
-            System.out.println(response.toString());
+            delete();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
