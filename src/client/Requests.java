@@ -49,11 +49,18 @@ public class Requests {
                 .build();
 
         Response response = Constants.HTTP_CLIENT.newCall(request).execute();
+        postResponse = getResponseMessage(response);
+    }
+
+    private String getResponseMessage(Response response) throws IOException {
         ResponseBody responseBody = response.body();
+        String message = "";
         if(responseBody != null) {
-            postResponse = responseBody.string();
+            ResponseMessage messageData = Constants.GSON_INSTANCE.fromJson(responseBody.string(), ResponseMessage.class);
+            message = messageData.getMessage();
             responseBody.close();
         }
+        return message;
     }
 
     private void put() throws IOException {
@@ -70,13 +77,7 @@ public class Requests {
                 .method("PUT", requestBody)
                 .build();
         Response response = Constants.HTTP_CLIENT.newCall(request).execute();
-        ResponseBody responseBody = response.body();
-
-        if(responseBody != null) {
-            ResponseMessage messageData = Constants.GSON_INSTANCE.fromJson(responseBody.string(), ResponseMessage.class);
-            putResponse = messageData.getMessage();
-            responseBody.close();
-        }
+        putResponse = getResponseMessage(response);
     }
 
     private void delete() throws IOException {
