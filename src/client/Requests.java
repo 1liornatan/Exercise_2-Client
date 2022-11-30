@@ -22,10 +22,9 @@ public class Requests {
     }
 
     private void get() throws IOException {
-        QueryParamBuilder param = new QueryParamBuilder();
         Time time = new Time();
 
-        param.addQueryParameter(Constants.PARAM_HOUR, time.getHour().toString());
+        QueryParamBuilder param = new QueryParamBuilder(Constants.PARAM_HOUR, time.getHour().toString());
         param.addQueryParameter(Constants.PARAM_MINUTE, time.getMinute().toString());
 
         Request request = new Request.Builder().url(baseURL + Constants.URL_GET + param).build();
@@ -66,9 +65,7 @@ public class Requests {
     private void put() throws IOException {
         Time time = new Time();
         PutData data = new PutData((time.getHour() + 21) % 24, (time.getMinute() + 13) % 60);
-        QueryParamBuilder param = new QueryParamBuilder();
-
-        param.addQueryParameter(Constants.PARAM_ID, postResponse);
+        QueryParamBuilder param = new QueryParamBuilder(Constants.PARAM_ID, postResponse);
 
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody requestBody = RequestBody.create(Constants.GSON_INSTANCE.toJson(data), mediaType);
@@ -81,8 +78,7 @@ public class Requests {
     }
 
     private void delete() throws IOException {
-        QueryParamBuilder param = new QueryParamBuilder();
-        param.addQueryParameter(Constants.PARAM_ID, putResponse);
+        QueryParamBuilder param = new QueryParamBuilder(Constants.PARAM_ID, putResponse);
 
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody requestBody = RequestBody.create("", mediaType);
