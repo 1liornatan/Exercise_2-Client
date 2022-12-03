@@ -1,7 +1,6 @@
 package client.tools;
 
 import java.util.Calendar;
-import java.util.Formatter;
 
 public class Time {
     private final Integer hour;

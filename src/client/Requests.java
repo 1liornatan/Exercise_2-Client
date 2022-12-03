@@ -13,6 +13,7 @@ import java.io.IOException;
 
 public class Requests {
     private final String baseURL;
+    private Time time;
     private String putResponse;
     private String postResponse;
     private String getResponse;
@@ -22,7 +23,8 @@ public class Requests {
     }
 
     private void get() throws IOException {
-        Time time = new Time();
+
+        time = new Time();
 
         QueryParamBuilder param = new QueryParamBuilder(Constants.PARAM_HOUR, time.getHour().toString());
         param.addQueryParameter(Constants.PARAM_MINUTE, time.getMinute().toString());
@@ -37,7 +39,6 @@ public class Requests {
     }
 
     private void post() throws IOException {
-        Time time = new Time();
         PostData data = new PostData(time.getHour(), time.getMinute(), getResponse);
 
         MediaType mediaType = MediaType.parse("application/json");
@@ -63,7 +64,6 @@ public class Requests {
     }
 
     private void put() throws IOException {
-        Time time = new Time();
         PutData data = new PutData((time.getHour() + 21) % 24, (time.getMinute() + 13) % 60);
         QueryParamBuilder param = new QueryParamBuilder(Constants.PARAM_ID, postResponse);
 

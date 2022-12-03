@@ -4,7 +4,11 @@ import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
 
 public class Constants {
-    public static final String URL_BASE = "http://localhost:8989";
+    private static final String HOST = "localhost";
+    private static final String PORT = "8989";
+    private static final String PROTOCOL = "http";
+
+    public static final String URL_BASE = PROTOCOL + "://" + HOST + ":" + PORT;
     public static final String URL_GET = "/test_get_method";
     public static final String URL_POST = "/test_post_method";
     public static final String URL_PUT = "/test_put_method";
